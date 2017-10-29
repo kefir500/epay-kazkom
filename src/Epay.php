@@ -269,10 +269,23 @@ class Epay
 
     /**
      * @return string
+     * @param $items
      */
-    public function generateAppendix()
+    public function generateAppendix($items = [])
     {
-        $template = '<document><item number="'.$this->order_id.'" name="payment" quantity="1" amount="'.$this->amount.'"/></document>';
+        if (!empty($items)) {
+            $template = '<document>';
+            foreach ($items as $index => $item) {
+                $itemNumber = isset($item['number']) ? $item['number'] : $index + 1;
+                $itemName = isset($item['name']) ? $item['name'] : 'Item';
+                $itemQuantity = isset($item['quantity']) ? $item['quantity'] : 1;
+                $itemAmount = isset($item['amount']) ? $item['amount'] : 0;
+                $template .= '<item number="'.$itemNumber.'" name="'.$itemName.'" quantity="'.$itemQuantity.'" amount="'.$itemAmount.'"/>';
+            }
+            $template .= '</document>';
+        } else {
+            $template = '<document><item number="'.$this->order_id.'" name="payment" quantity="1" amount="'.$this->amount.'"/></document>';
+        }
 
         return base64_encode($template);
     }
